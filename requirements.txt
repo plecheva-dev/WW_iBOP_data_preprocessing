@@ -1,2 +1,4 @@
-ipykernel
-setuptools
+setuptools==82.0.0
+ipykernel==7.2.0
+pandas==3.0.1
+seaborn
