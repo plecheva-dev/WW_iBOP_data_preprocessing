@@ -92,25 +92,34 @@ def apply_outlier_detection_pipeline(spectra_df, plot=True):
             ax=ax[0, 0], wav=wav, spectra_df=all_spectra, title="All spectra", display_stats=True)
         ax[0, 0].plot(wav, valid_spectra_df.median(axis=0), ls="--", label="Final valid median")
         subplot_helper(
-            ax=ax[1, 0], wav=wav, spectra_df=minmax_outliers, title="MinMax outlier")
+            ax=ax[1, 0], wav=wav, spectra_df=minmax_outliers, title="Step ii: saturation detect. and repair")
         
         subplot_helper(
-            ax=ax[2, 0], wav=wav, spectra_df=remaining_after_minmax, title="Remaining after MiMmax", display_stats=True)
+            ax=ax[2, 0], wav=wav, spectra_df=remaining_after_minmax, title="Remaining after step ii", display_stats=True)
         subplot_helper(
-            ax=ax[3, 0], wav=wav, spectra_df=iter1_outlier, title="Iter1 outlier")
+            ax=ax[3, 0], wav=wav, spectra_df=iter1_outlier, title="Step iii: broad iter. outlier detect.")
         
         subplot_helper(
-            ax=ax[0, 1], wav=wav, spectra_df=remaining_after_iter1, title="Remaining after Iter1", display_stats=True)
+            ax=ax[0, 1], wav=wav, spectra_df=remaining_after_iter1, title="Remaining after steo iii", display_stats=True)
         subplot_helper(
-            ax=ax[1, 1], wav=wav, spectra_df=slope576_outlier, title="Slope outliers")
+            ax=ax[1, 1], wav=wav, spectra_df=slope576_outlier, title="Step iv: outlier detection at 576 nm")
         
         subplot_helper(
-            ax=ax[2, 1], wav=wav, spectra_df=remaining_after_slope, title="Remaining after Slope", display_stats=True)
+            ax=ax[2, 1], wav=wav, spectra_df=remaining_after_slope, title="Remaining after step iv", display_stats=True)
         subplot_helper(
-            ax=ax[3, 1], wav=wav, spectra_df=iter2_outlier, title="Iter2 outlier")
+            ax=ax[3, 1], wav=wav, spectra_df=iter2_outlier, title="Step iii: broad iter. outlier detect.")
 
         subplot_helper(
             ax=ax[3, 2], wav=wav, spectra_df=valid_spectra_df, title="Valid spectra", display_stats=True)
+        
+        ax[3, 0].set_xlabel("Wavelength [nm]")
+        ax[3, 1].set_xlabel("Wavelength [nm]")
+        ax[3, 2].set_xlabel("Wavelength [nm]")
+        
+        ax[0, 0].set_ylabel("Abs. / Beam att. [1/m]")
+        ax[1, 0].set_ylabel("Abs. / Beam att. [1/m]")
+        ax[2, 0].set_ylabel("Abs. / Beam att. [1/m]")
+        ax[3, 0].set_ylabel("Abs. / Beam att. [1/m]")
         
         plt.tight_layout()
 

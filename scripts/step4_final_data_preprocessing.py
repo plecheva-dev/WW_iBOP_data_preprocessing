@@ -1,12 +1,13 @@
 
 from custom_python_tools.acs_utils import get_runs_list_from_samplename_and_metadata
-from custom_python_tools.acs_utils import handle_exception_when_run_not_working, convert_run_list_to_string
+from custom_python_tools.acs_utils import handle_exception_when_run_not_working
 from custom_python_tools.acs_utils import concatenate_df
 from custom_python_tools.acs_data_reader import get_acs_IOP
 from custom_python_tools.acs_outlier_detection_pipeline import apply_outlier_detection_pipeline
 from custom_python_tools.acs_scattering_coefficient_calculation import calculate_scattering_spectrum
 import pandas as pd
-import json
+import matplotlib.pyplot as plt
+from pathlib import Path
 import os
 import warnings
 warnings.filterwarnings("ignore")
@@ -51,6 +52,8 @@ def preprocess_final_spectra_df(spectra_df):
 def main():
     acs_dir_path = "data/raw_data_subset_for_this_package/1_acs_runs"
     data_output_path = "data/processed"
+    figures_output_path = Path("figures/step4_final_data_preprocessing")
+    figures_output_path.mkdir(parents=True, exist_ok=True)
     acs_metadata_df = pd.read_csv("data/raw_data_subset_for_this_package/metadata_acs.csv")
 
     samplename_list = acs_metadata_df["sample_name"].unique()
@@ -80,15 +83,17 @@ def main():
 
             n_cumm_sp_A = df_arr_A_cumm.shape[0]
             if n_cumm_sp_A>0:
-                df_arr_A_cumm_clean, _ = apply_outlier_detection_pipeline(df_arr_A_cumm, plot=False) 
+                df_arr_A_cumm_clean, figA = apply_outlier_detection_pipeline(df_arr_A_cumm, plot=True) 
                 median_A_cumm = df_arr_A_cumm_clean.median(axis=0)
                 clean_spectra_A_dict[samplename] = median_A_cumm
+                figA.savefig(figures_output_path / f"{samplename}_absorption.png")
                 
             n_cumm_sp_C = df_arr_C_cumm.shape[0]
             if n_cumm_sp_C>0:
-                df_arr_C_cumm_clean, _ = apply_outlier_detection_pipeline(df_arr_C_cumm, plot=False)
+                df_arr_C_cumm_clean, figC = apply_outlier_detection_pipeline(df_arr_C_cumm, plot=True)
                 median_C_cumm = df_arr_C_cumm_clean.median(axis=0)
                 clean_spectra_C_dict[samplename] = median_C_cumm
+                figC.savefig(figures_output_path / f"{samplename}_beam_attenuation.png")
                 
             if n_cumm_sp_A > 0 and n_cumm_sp_C > 0:
                 # Extract median spectra and wavelength arrays
@@ -100,7 +105,8 @@ def main():
                 
                 # Store in dictionary (using A wavelengths as the reference grid)
                 clean_spectra_B_dict[samplename] = scattering_spectrum
-                
+            
+            plt.close('all')
                 
     col_A = df_arr_A.columns
     clean_spectra_A_df = process_and_save_spectra(
